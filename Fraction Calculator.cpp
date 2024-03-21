@@ -1,116 +1,313 @@
-#include <iostream>
-#include <cctype>
-#include <string>
-#include <vector>
+/*
+File: CS112_A2_T3_21_20230161_20230109_20230476.cpp
+Purpose: Fraction Calculator
+Authors:
+    Zeyad Mohamed Arafat - 20230161   s21   zeyadarafat833@gmail.com
+    John Ayman Demian    - 20230109   s21   johnayman03@gmail.com
+    Youssef Ahmed Beshir - 20230476   s21   youssefahmedbeshir@gmail.com
+
+20230161 - Multiplication, division functions
+20230109 - Summation, subtraction functions
+20230476 - Regex expression, separated each term in the operand expression
+
+Report: https://drive.google.com/file/d/1ZuIo6c4BASkUHX9dGvE27w2uE4PCAYS1/view?usp=drive_link 
+ */
+
+#include <bits/stdc++.h>
+
 using namespace std;
-int main() {
-    // set main variables
-    string yes, choice, text, key , encrypted_text, decrypted_text;
-    int num;
-    // print welcome message 
-    cout << "welcome to Rail Fence encrypt program " << endl;
-        
-                while (true) {
-                    // let user select the key
-                    cout << "please choose the key 3 or 4 :  " ;
-                    getline(cin , key ) ;
-                    //check validition of key
-                    if (key == "3" || key == "4")
-                    {   int num = stoi(key) ;
-                        if( num == 3 ) {
-                            // make 3 lists 
-                            vector <char> list1 , list2 , list3;
-                            // make first list to collect the first row by adding 4 each loop
-                            for (int i = 0; i < text.length() ; i+=4) {
-                                list1.push_back(text[i]);
-                            }
-                            // make second to collect second row by adding 2 each loop
-                            for (int j = 1 ; j < text.length(); j+=2) {
-                                list2.push_back(text[j]);
-                            }
-                            // make third to collect third row by adding 4 each loop
-                            for (int y = 2; y < text.length(); y+=4) {
-                                list3.push_back(text[y]);
-                            }
-                            // print the result of three lists
-                            cout << "Cipher text : ";
-                            for (char c : list1) {
-                                cout << c;
-                            }
-                            for (char c : list2) {
-                                cout << c;
-                            }
-                            for (char c : list3) {
-                                cout << c;
-                            }
-                            cout << endl;
-                            break;
-                        } 
-                        else if (num == 4) {
-                            // make 4 lists 
-                            vector <char> list1 , list2 , list3 , list4 ;
-                            // first to collect first row by adding 6 each loop
-                            for (int i = 0; i < text.length() ; i+=6) {
-                                list1.push_back(text[i]);
-                            }
-                            // second one to collect second row 
-                            // but flag to iterate each loop between 4 , 2 
-                            bool addFour = true;
-                            for (int j = 1; j < text.length();) {
-                                list2.push_back(text[j]);
-                                // here add 4 first time
-                                if (addFour) {
-                                    j += 4; 
-                                // and 2 in second time
-                                } else {
-                                    j += 2; 
-                                }
-                                addFour = !addFour; // Toggle the flag
-                            }
-                            // third one to collect third row 
-                            // but flag to iterate each loop between 2 , 4 
-                            bool addTwo = true ;
-                            for (int y = 2 ; y < text.length(); ) {
-                                list3.push_back(text[y]);
-                                // here add 2 first time
-                                if (addTwo) {
-                                    y += 2; 
-                                // and 4 in second time    
-                                } else {
-                                    y += 4; 
-                                }
-                                addTwo = !addTwo; // Toggle the flag
-                            }
-                            // fourth one to collect last row by adding 6 each loop
-                            for (int u = 3; u < text.length(); u+=6) {
-                                list4.push_back(text[u]);
-                            }
-                            // print the result of four lists
-                            cout << "Cipher text : ";
-                            for (char c : list1) {
-                                cout << c;
-                            }
-                            for (char c : list2) {
-                                cout << c;
-                            }
-                            for (char c : list3) {
-                                cout << c;
-                            }
-                            for (char c : list4) {
-                                cout << c;
-                            }
-                            cout << endl;
-                            break;
-                        } 
-                        else {
-                            continue;
-                        }
+
+// Function to strip whitespaces from a string
+string strip(const string& calc){
+    string stripped;
+    for (char i : calc){
+        if(not isspace(i)){
+            stripped += i;
+        }
+    }
+    return stripped;
+}
+
+// Function to perform addition of fractions
+void summation(int sign1, int sign2, const string& nominator1, const string& denominator1,
+               const string& nominator2, const string& denominator2){
+
+    int nominator, denominator;
+    if (denominator1 == "0" || denominator2 == "0"){
+        cout << "Error: Division by zero." << endl << endl;
+        return;
+    }
+
+    nominator = ((stoi(nominator1) * stoi(denominator2) * sign1)) +
+                ((stoi(nominator2) * stoi(denominator1) * sign2));
+    denominator = (stoi(denominator1) * stoi(denominator2));
+
+    // Find the greatest common divisor
+    int comn_factor = __gcd(nominator, denominator);
+
+    // Simplify the fraction
+    nominator /= comn_factor;
+    denominator /= comn_factor;
+
+    if (denominator == 1){
+        cout << "result is: " << nominator << endl << endl;
+    }
+    else{
+        cout << "result is: " << nominator << "/" << denominator << endl << endl;
+    }
+}
+
+// Function to perform subtraction of fractions
+void subtraction(int sign1, int sign2, const string& nominator1, const string& denominator1,
+                 const string& nominator2, const string& denominator2){
+    int nominator, denominator ;
+
+    if (denominator1 == "0" || denominator2 == "0"){
+        cout << "Error: Division by zero." << endl;
+        return;
+    }
+
+    nominator = ((stoi(nominator1) * stoi(denominator2) * sign1)) -
+                ((stoi(nominator2) * stoi(denominator1) * sign2));
+    denominator = (stoi(denominator1) * stoi(denominator2));
+
+    // Find the greatest common divisor
+    int comn_factor = __gcd(nominator, denominator);
+
+    // Simplify the fraction
+    nominator /= comn_factor;
+    denominator /= comn_factor;
+
+    if (denominator == 1){
+        cout << "result is: " << nominator << endl << endl;
+    }
+    else{
+        cout << "result is: " << nominator << "/" << denominator << endl << endl;
+    }
+}
+
+// Function to perform multiplication of fractions
+void multiplication(int sign1, int sign2, const string& nominator1, const string& denominator1,
+                    const string& nominator2, const string& denominator2){
+    int nominator, denominator;
+
+    if (denominator1 == "0" || denominator2 == "0"){
+        cout << "Error: Division by zero." << endl << endl;
+        return;
+    }
+
+    nominator = sign1 * stoi(nominator1) * stoi(nominator2);
+    denominator = sign2 * stoi(denominator1) * stoi(denominator2);
+
+    for (int i = min(abs(nominator), abs(denominator)); i > 1; i--){
+        if ((nominator % i == 0) and (denominator % i == 0)){
+            nominator = nominator / i;
+            denominator = denominator / i;
+            break;
+        }
+    }
+
+    if (denominator == 1){
+        cout << "result: " << nominator << endl << endl;
+    }
+    else {
+        cout << "result: " << nominator << "/" << denominator << endl << endl;
+    }
+}
+
+// Function to perform division of fractions
+void division(int sign1, int sign2, const string& nominator1, const string& denominator1,
+              const string& nominator2, const string& denominator2){
+    int nominator, denominator;
+
+    if (denominator1 == "0" || denominator2 == "0"){
+        cout << "Error: Division by zero." << endl << endl;
+        return;
+    }
+
+    nominator = sign1 * stoi(nominator1) * stoi(denominator2);
+    denominator = sign2 * stoi(denominator1) * stoi(nominator2);
+
+    for (int i = min(abs(nominator), abs(denominator)); i > 1; i--){
+        if ((nominator % i == 0) and (denominator % i == 0)){
+            nominator = nominator / i;
+            denominator = denominator / i;
+            break;
+        }
+    }
+
+    if (denominator == 1){
+        cout << "result: " << nominator << endl << endl;
+    }
+    else {
+        cout << "result: " << nominator << "/" << denominator << endl << endl;
+    }
+}
+
+// Main function
+int main(){
+    int stTermSign = 1, ndTermSign = 1;
+    string operation, nominator1, denominator1, nominator2, denominator2;
+    cout << "|| FRACTION CALCULATOR ||" << endl << endl;
+
+    // Main loop for the calculator
+    while (true){
+        operation = "", nominator1 = "", denominator1 = "", nominator2 = "", denominator2 = "";
+        string operand;
+
+        cout << "Please enter a rational number operations or (exit)" << endl;
+        cout << "->";
+        getline(cin, operand);
+
+        if (operand == "exit"){
+            cout << "Thank you for using rational number calculator." << endl;
+            break;
+        }
+
+        else{
+            // Regular expression to validate the input
+            regex calcRegex(R"([-+]?[0-9]+[/]?[-+]?[0-9]*\s{1}[\+\-\*\/]{1}\s{1}[-+]?[0-9]+[/]?[-+]?[0-9]*)");
+
+            if (not regex_match(operand, regex(calcRegex))){
+                cout << "Invalid operand, Try again." << endl << endl;
+                continue;
+            }
+
+            operand = strip(operand);
+
+            // Parsing the input expression
+            int i = 0;
+            if (operand[0] == '-'){
+                stTermSign = -1;
+                i++;
+            }
+            else if (operand[0] == '+'){
+                stTermSign = 1;
+                i++;
+            }
+
+            // First nominator
+            while (isdigit(operand[i])){
+                nominator1 += operand[i];
+                i++;
+            }
+
+            // first denominator
+            if (operand[i] == '/'){
+                i++;
+                if (operand[i] == '-'){
+                    if (stTermSign == -1){
+                        stTermSign = 1;
+                    }
+                    else{
+                        stTermSign = -1;
+                    }
+                    i++;
                 }
-                else{
-                    continue;
+                else if(operand[i] == '+'){
+                    if (stTermSign == -1){
+                        stTermSign = -1;
+                    }
+                    else {
+                        stTermSign = 1;
+                    }
+                    i++;
                 }
-             break;
-              }
-            
-        } 
-    
+
+                while(isdigit(operand[i])){
+                    denominator1 += operand[i];
+                    i++;
+                }
+            }
+            else{
+                denominator1 = "1";
+            }
+
+            // Operation
+            if (operand[i] == '+'){
+                operation = "+";
+                i++;
+            }
+
+            else if (operand[i] == '-'){
+                operation = "-";
+                i++;
+            }
+
+            else if (operand[i] == '*'){
+                operation = "*";
+                i++;
+            }
+
+            else if (operand[i] == '/'){
+                operation = "/";
+                i++;
+            }
+
+            // Second nominator sign
+            if (operand[i] == '-'){
+                ndTermSign = -1;
+                i++;
+            }
+            else if (operand[i] == '+'){
+                ndTermSign = 1;
+                i++;
+            }
+
+            // Second nominator
+            while (isdigit(operand[i])){
+                nominator2 += operand[i];
+                i++;
+            }
+
+            // second denominator
+            if (operand[i] == '/'){
+                i++;
+                if (operand[i] == '-'){
+                    if (ndTermSign == -1){
+                        ndTermSign = 1;
+                    }
+                    else{
+                        ndTermSign = -1;
+                    }
+                    i++;
+                }
+                else if (operand[i] == '+'){
+                    if (ndTermSign == -1){
+                        ndTermSign = -1;
+                    }
+                    else{
+                        ndTermSign = 1;
+                    }
+                    i++;
+                }
+
+                while(isdigit(operand[i])){
+                    denominator2 += operand[i];
+                    i++;
+                }
+            }
+            else{
+                denominator2 = "1";
+            }
+        }
+
+        // Perform the corresponding operation based on the input
+        if (operation == "*"){
+            multiplication(stTermSign, ndTermSign, nominator1, denominator1, nominator2, denominator2);
+        }
+        else if (operation == "/"){
+            division(stTermSign, ndTermSign, nominator1, denominator1, nominator2, denominator2);
+        }
+        else if (operation == "+"){
+            summation(stTermSign, ndTermSign, nominator1, denominator1, nominator2, denominator2);
+        }
+        else if (operation == "-"){
+            subtraction(stTermSign, ndTermSign, nominator1, denominator1, nominator2, denominator2);
+        }
+        else
+            continue;
+    }
+
+    return 0;
+}
